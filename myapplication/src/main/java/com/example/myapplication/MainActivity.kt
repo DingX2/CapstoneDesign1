@@ -27,6 +27,7 @@ import java.net.Socket
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import org.json.JSONObject
+import java.net.InetSocketAddress
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,7 +43,6 @@ class MainActivity : AppCompatActivity() {
 
     private val PERMISSIONS_REQUEST_LOCATION = 100
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,7 +50,11 @@ class MainActivity : AppCompatActivity() {
         // 메인 서버 : ip : 15.165.129.230 / port : 8080
         connectToServer("15.165.129.230" ,8080)
 
+        Log.d("LSH","Connect to server")
+
+
         udpSocket = DatagramSocket()
+        //처음 연결요청 할 send 값 안 적어도 될거같아요 어차피 메인서버 아닌가요??
         addressInput = findViewById(R.id.addressInput)
         dataInput = findViewById(R.id.dataInput)
 
@@ -103,6 +107,7 @@ class MainActivity : AppCompatActivity() {
                 //val thread: UdpSocketThread =
                 //    UdpSocketThread(addressInput.text.toString(), dataInput.text.toString())
 
+            //서버로 받은 값은 getIP, getPort로 UDP 보내기
             val thread: UdpSocketThread =
                         UdpSocketThread(getIP,getData)
                 Log.d("LSH", "UDP created")
@@ -172,49 +177,58 @@ class MainActivity : AppCompatActivity() {
                 return null
             }
         }*/
-
+internal class UdpSocketThread(var ip: String, var data: String) :
+    Thread() {
+    override fun run() {
+        Log.d("LSH", "Thread ip: {$ip}, data {$data}")
+        try {
+            val datagramSocket = DatagramSocket()
+            val inetAddress = InetAddress.getByName(ip)
+            val datagramPacket =
+                DatagramPacket(
+                    data.toByteArray(),
+                    data.toByteArray().size,
+                    inetAddress,
+                    3000
+                )
+            datagramSocket.send(datagramPacket)
+        } catch (e: SocketException) {
+            Log.e("LSH", "SocketException")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+}
 fun connectToServer(host: String, port: Int) {
+    Log.d("LSH","Connect?")
     try {
-        val socket = Socket(host, port)
-       Log.d("LSH","TCP connection established")
+        val socket = Socket()
+        val socketAddress = InetSocketAddress(host, port)
+        val SOCKET_TIMEOUT = 5000 // 5 seconds in milliseconds
+        socket.connect(socketAddress, SOCKET_TIMEOUT)
+
+        //val socket = Socket(host, port)
+        Log.d("LSH","TCP connection established")
         val input = BufferedReader(InputStreamReader(socket.getInputStream()))
+        //val jsonString = "{ \"IP\" : \"15.165.22.113\" , \"PORT\" : 3000 }"
         val jsonString = input.readLine()
-        val (ip, port) = parseJsonConfig(jsonString)
-        Log.d("LSH","IP: $ip, Port: $port")
+        val (getIP, getPort) = parseJsonConfig(jsonString)
+        println("IP: $getIP, Port: $getPort") // IP: 15.165.22.113, Port: 3000
+        Log.d("LSH","IP: $getIP, Port: $getPort")
         socket.close()
     } catch (e: Exception) {
         e.printStackTrace()
+        Log.d("LSH","Connect failed")
     }
 }
 
 fun parseJsonConfig(jsonString: String): Pair<String, Int> {
     val jsonObject = JSONObject(jsonString)
-    val ip = jsonObject.getString("ip")
-    val port = jsonObject.getInt("port")
+    val ip = jsonObject.getString("IP")
+    val port = jsonObject.getInt("PORT")
     return Pair(ip, port)
 }
 
-    internal class UdpSocketThread(var ip: String, var data: String) :
-            Thread() {
-            override fun run() {
-                Log.d("LSH", "Thread ip: {$ip}, data {$data}")
-                try {
-                    val datagramSocket = DatagramSocket()
-                    val inetAddress = InetAddress.getByName(ip)
-                    val datagramPacket =
-                        DatagramPacket(
-                            data.toByteArray(),
-                            data.toByteArray().size,
-                            inetAddress,
-                            3000
-                        )
-                    datagramSocket.send(datagramPacket)
-                } catch (e: SocketException) {
-                    Log.e("LSH", "SocketException")
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        }
+
 
 
