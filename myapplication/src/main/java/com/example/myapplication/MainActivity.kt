@@ -199,27 +199,34 @@ internal class UdpSocketThread(var ip: String, var data: String) :
         }
     }
 }
-fun connectToServer(host: String, port: Int) {
-    Log.d("LSH","Connect?")
-    try {
-        val socket = Socket()
-        val socketAddress = InetSocketAddress(host, port)
-        val SOCKET_TIMEOUT = 5000 // 5 seconds in milliseconds
-        socket.connect(socketAddress, SOCKET_TIMEOUT)
 
-        //val socket = Socket(host, port)
-        Log.d("LSH","TCP connection established")
-        val input = BufferedReader(InputStreamReader(socket.getInputStream()))
-        //val jsonString = "{ \"IP\" : \"15.165.22.113\" , \"PORT\" : 3000 }"
-        val jsonString = input.readLine()
-        val (getIP, getPort) = parseJsonConfig(jsonString)
-        println("IP: $getIP, Port: $getPort") // IP: 15.165.22.113, Port: 3000
-        Log.d("LSH","IP: $getIP, Port: $getPort")
-        socket.close()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Log.d("LSH","Connect failed")
-    }
+//TCP 연결
+fun connectToServer(host: String, port: Int) {
+    Thread {
+        try {
+            val socket = Socket()
+            val socketAddress = InetSocketAddress(host, port)
+            val SOCKET_TIMEOUT = 5000 // 5 seconds in milliseconds
+            socket.connect(socketAddress, SOCKET_TIMEOUT)
+
+            //val socket = Socket(host, port)
+            Log.d("LSH","TCP connection established")
+
+            val outputStream = socket.getOutputStream()
+            outputStream.write("test\n".toByteArray())
+            val input = BufferedReader(InputStreamReader(socket.getInputStream()))
+            Log.d("LSH","input : $input")
+            //val jsonString = "{ \"IP\" : \"15.165.22.113\" , \"PORT\" : 3000 }"
+            val jsonString = input.readLine()
+            val (getIP, getPort) = parseJsonConfig(jsonString)
+            println("IP: $getIP, Port: $getPort") // IP: 15.165.22.113, Port: 3000
+            Log.d("LSH","IP: $getIP, Port: $getPort")
+            socket.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("LSH","Connect failed")
+        }
+    }.start()
 }
 
 fun parseJsonConfig(jsonString: String): Pair<String, Int> {
