@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="5dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="UDP Server"
+        android:textSize="30dp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/serverIp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="IP Adrress : "
+        android:textSize="20dp"/>
+
+    <TextView
+        android:id="@+id/clientMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="클라이언트로 부터 받은 메세지 : "
+        android:textSize="15dp"/>
+</LinearLayout>

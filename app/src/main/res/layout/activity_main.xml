@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UDP Client"
+        android:layout_gravity="center"
+        android:textSize="30dp"/>
+
+    <EditText
+        android:id="@+id/editIP"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="ip주소를 입력하시오."/>
+    <EditText
+        android:id="@+id/editMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="보낼 메세지를 입력 하시오."/>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="메세지 전송"/>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="서버로 부터 받은 메세지 :"/>
+</LinearLayout>
