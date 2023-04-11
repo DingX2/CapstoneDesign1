@@ -12,6 +12,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.TestForUDP">
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="wdv1jpedef" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

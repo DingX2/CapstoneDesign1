@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
@@ -16,18 +15,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
-import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.InetAddress
-import java.net.SocketException
-import java.io.OutputStream
-import java.net.Socket
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.MapView
+import com.naver.maps.map.NaverMapSdk
+import com.naver.maps.map.overlay.Marker
 import org.json.JSONObject
-import java.net.InetSocketAddress
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,10 +37,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var getIP: String
     private lateinit var getData: String
 
+    private lateinit var mapView: MapView
+
     private val PERMISSIONS_REQUEST_LOCATION = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NaverMapSdk.getInstance(this).setClient(
+            NaverMapSdk.NaverCloudPlatformClient("wdv1jpedef")
+        )
         setContentView(R.layout.activity_main)
 
         // 메인 서버 : ip : 15.165.129.230 / port : 8080
@@ -114,6 +115,26 @@ class MainActivity : AppCompatActivity() {
                 thread.start()
                 Log.d("LSH", "Did you get it?")
             }
+
+//GPS marker
+
+        // 레이아웃 파일에서 MapView를 가져와서 초기화합니다.
+        mapView = findViewById(R.id.mapView)
+        mapView.onCreate(savedInstanceState)
+
+        val marker = Marker().apply {
+            position = LatLng(37.5670135, 126.9783740)
+            setOnClickListener {
+                //Toast.makeText(context, "마커 클릭됨", Toast.LENGTH_SHORT).show()
+                true
+            }
+        }
+
+// NaverMap 객체를 가져오기 위해 MapView에서 getMapAsync 메서드를 사용합니다.
+        mapView.getMapAsync { naverMap ->
+            marker.map = naverMap // 마커를 지도에 추가합니다.
+        }
+
 
                 /*
             if (locationPermissionGranted) {
@@ -236,6 +257,11 @@ fun parseJsonConfig(jsonString: String): Pair<String, Int> {
     val port = jsonObject.getInt("PORT")
     return Pair(ip, port)
 }
+
+
+
+
+
 
 
 
