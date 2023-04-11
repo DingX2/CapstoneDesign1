@@ -22,6 +22,11 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.SocketException
+import java.io.OutputStream
+import java.net.Socket
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,12 +37,18 @@ class MainActivity : AppCompatActivity() {
     private var locationPermissionGranted = false
     private lateinit var udpSocket: DatagramSocket
 
+    private lateinit var getIP: String
+    private lateinit var getData: String
+
     private val PERMISSIONS_REQUEST_LOCATION = 100
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // 메인 서버 : ip : 15.165.129.230 / port : 8080
+        connectToServer("15.165.129.230" ,8080)
 
         udpSocket = DatagramSocket()
         addressInput = findViewById(R.id.addressInput)
@@ -89,8 +100,11 @@ class MainActivity : AppCompatActivity() {
 
 
             // GPS 정보 누락시 GPS 정보가 logcat에 뜨지 않고 lost it 반환
-                val thread: UdpSocketThread =
-                    UdpSocketThread(addressInput.text.toString(), dataInput.text.toString())
+                //val thread: UdpSocketThread =
+                //    UdpSocketThread(addressInput.text.toString(), dataInput.text.toString())
+
+            val thread: UdpSocketThread =
+                        UdpSocketThread(getIP,getData)
                 Log.d("LSH", "UDP created")
                 thread.start()
                 Log.d("LSH", "Did you get it?")
@@ -159,6 +173,26 @@ class MainActivity : AppCompatActivity() {
             }
         }*/
 
+fun connectToServer(host: String, port: Int) {
+    try {
+        val socket = Socket(host, port)
+       Log.d("LSH","TCP connection established")
+        val input = BufferedReader(InputStreamReader(socket.getInputStream()))
+        val jsonString = input.readLine()
+        val (ip, port) = parseJsonConfig(jsonString)
+        Log.d("LSH","IP: $ip, Port: $port")
+        socket.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+fun parseJsonConfig(jsonString: String): Pair<String, Int> {
+    val jsonObject = JSONObject(jsonString)
+    val ip = jsonObject.getString("ip")
+    val port = jsonObject.getInt("port")
+    return Pair(ip, port)
+}
 
     internal class UdpSocketThread(var ip: String, var data: String) :
             Thread() {
@@ -182,4 +216,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
 
