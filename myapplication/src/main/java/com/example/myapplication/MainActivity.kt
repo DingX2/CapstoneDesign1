@@ -215,7 +215,8 @@ fun connectToServer(host: String, port: Int) {
             val outputStream = socket.getOutputStream()
             outputStream.write("test\n".toByteArray())
             val input = BufferedReader(InputStreamReader(socket.getInputStream()))
-            Log.d("LSH","input : $input")
+            val line = input.readLine()
+            Log.d("LSH","Received input: $line")
             //val jsonString = "{ \"IP\" : \"15.165.22.113\" , \"PORT\" : 3000 }"
             val jsonString = input.readLine()
             val (getIP, getPort) = parseJsonConfig(jsonString)
