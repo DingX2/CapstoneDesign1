@@ -70,11 +70,13 @@ class MainActivity : AppCompatActivity() {
             Log.d("LSH", "send to ${addressInput.text.toString()} ${dataInput.text.toString()}")
 
             //서버로 받은 값은 getIP, getPort로 UDP 보내기
+            //Received input: { "IP" : "15.165.22.113" , "PORT" : 3000 }
             //Log.d("LSH", "UDP created getIP : ${getIP}")
-            val thread : UdpSocketThread = UdpSocketThread("15.165.22.113")
-            Log.d("LSH", "UDP created")
-            thread.start()
-            Log.d("LSH", "Did you get it?")
+//            val thread : UdpSocketThread = UdpSocketThread(getIP.toString())
+//            //val thread : UdpSocketThread = UdpSocketThread("15.165.22.113")
+//            Log.d("LSH", "UDP created")
+//            thread.start()
+//            Log.d("LSH", "Did you get it?")
         }
 
             //GPS가 작동하지 않는 경우는, 권한이 없거나, GPS 모듈이 꺼져있는 경우
@@ -210,7 +212,7 @@ class MainActivity : AppCompatActivity() {
 internal class UdpSocketThread(var ip: String) :
     Thread() {
     override fun run() {
-        var data : String="test"
+        var data : String="HelloUDP"
         Log.d("LSH", "Thread ip: {$ip}")
         try {
             val datagramSocket = DatagramSocket()
@@ -264,6 +266,14 @@ fun connectToServer(host: String, port: Int) {
             val (getIP, getPort) = parseJsonConfig(msg)
             println("IP: $getIP, Port: $getPort") // IP: 15.165.22.113, Port: 3000
             Log.d("LSH","IP: $getIP, Port: $getPort")
+
+            //UDP전송
+            val thread : UdpSocketThread = UdpSocketThread(getIP)
+            //val thread : UdpSocketThread = UdpSocketThread("15.165.22.113")
+            Log.d("LSH", "UDP created")
+            thread.start()
+            Log.d("LSH", "Did you get it?")
+
             socket.close()
         } catch (e: Exception) {
             e.printStackTrace()
