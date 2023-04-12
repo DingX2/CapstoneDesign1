@@ -213,7 +213,7 @@ internal class UdpSocketThread(var ip: String) :
     Thread() {
     override fun run() {
         var data : String="HelloUDP"
-        Log.d("LSH", "Thread ip: {$ip}")
+        Log.d("LSH", "Thread ip: {$ip}, data:{$data}")
         try {
             val datagramSocket = DatagramSocket()
             val inetAddress = InetAddress.getByName(ip)
