@@ -69,6 +69,14 @@ class MainActivity : AppCompatActivity() {
             Log.d("LSH", "button Click")
             Log.d("LSH", "send to ${addressInput.text.toString()} ${dataInput.text.toString()}")
 
+            //서버로 받은 값은 getIP, getPort로 UDP 보내기
+            //Log.d("LSH", "UDP created getIP : ${getIP}")
+            val thread : UdpSocketThread = UdpSocketThread("15.165.22.113")
+            Log.d("LSH", "UDP created")
+            thread.start()
+            Log.d("LSH", "Did you get it?")
+        }
+
             //GPS가 작동하지 않는 경우는, 권한이 없거나, GPS 모듈이 꺼져있는 경우
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -110,13 +118,12 @@ class MainActivity : AppCompatActivity() {
                 //val thread: UdpSocketThread =
                 //    UdpSocketThread(addressInput.text.toString(), dataInput.text.toString())
 
-            //서버로 받은 값은 getIP, getPort로 UDP 보내기
-            val thread: UdpSocketThread =
-                        UdpSocketThread(getIP)
-                Log.d("LSH", "UDP created")
-                thread.start()
-                Log.d("LSH", "Did you get it?")
-            }
+//            //서버로 받은 값은 getIP, getPort로 UDP 보내기
+//            val thread : UdpSocketThread = UdpSocketThread(getIP)
+//                Log.d("LSH", "UDP created")
+//                thread.start()
+//                Log.d("LSH", "Did you get it?")
+//            }
 
 //GPS marker
 
