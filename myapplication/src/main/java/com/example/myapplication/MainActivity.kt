@@ -22,8 +22,10 @@ import com.naver.maps.map.overlay.Marker
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.*
+import java.nio.charset.Charset
 
 class MainActivity : AppCompatActivity() {
 
@@ -110,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
             //서버로 받은 값은 getIP, getPort로 UDP 보내기
             val thread: UdpSocketThread =
-                        UdpSocketThread(getIP,getData)
+                        UdpSocketThread(getIP)
                 Log.d("LSH", "UDP created")
                 thread.start()
                 Log.d("LSH", "Did you get it?")
@@ -198,10 +200,11 @@ class MainActivity : AppCompatActivity() {
                 return null
             }
         }*/
-internal class UdpSocketThread(var ip: String, var data: String) :
+internal class UdpSocketThread(var ip: String) :
     Thread() {
     override fun run() {
-        Log.d("LSH", "Thread ip: {$ip}, data {$data}")
+        var data : String="test"
+        Log.d("LSH", "Thread ip: {$ip}")
         try {
             val datagramSocket = DatagramSocket()
             val inetAddress = InetAddress.getByName(ip)
@@ -235,12 +238,23 @@ fun connectToServer(host: String, port: Int) {
 
             val outputStream = socket.getOutputStream()
             outputStream.write("test\n".toByteArray())
-            val input = BufferedReader(InputStreamReader(socket.getInputStream()))
-            val line = input.readLine()
-            Log.d("LSH","Received input: $line")
-            //val jsonString = "{ \"IP\" : \"15.165.22.113\" , \"PORT\" : 3000 }"
-            val jsonString = input.readLine()
-            val (getIP, getPort) = parseJsonConfig(jsonString)
+            val byte:ByteArray = ByteArray(1001)
+            val IS : InputStream = socket.getInputStream()
+            //Log.d("LSH","IS = $IS")
+            val bytecount = IS.read(byte)
+            println("가져온 문자열 개수 : "+bytecount)
+            Log.d("LSH","byte count = $bytecount")
+            var temp = String(byte)
+            println("copyofRange처리 이전값"+temp)
+            Log.d("LSH","temp = $temp")
+            var nbyte = byte.copyOfRange(0,bytecount)
+
+            val msg = String(nbyte)
+
+            println("Line 220번"+msg)
+            Log.d("LSH","Received input: $msg")
+
+            val (getIP, getPort) = parseJsonConfig(msg)
             println("IP: $getIP, Port: $getPort") // IP: 15.165.22.113, Port: 3000
             Log.d("LSH","IP: $getIP, Port: $getPort")
             socket.close()
